@@ -11,6 +11,8 @@ class Project(db.Model):
     description = db.Column(db.Text)
     color = db.Column(db.String(7), default='#3498db')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc))
     tasks = db.relationship('Task', backref='project', lazy='dynamic', cascade='all, delete-orphan')
 
     @property
@@ -27,6 +29,22 @@ class Project(db.Model):
             return 0
         return int((self.completed_task_count / self.task_count) * 100)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'task_count': self.tasks.count()
+        }
+
+    def to_dict_with_tasks(self):
+        return {
+            **self.to_dict(),
+            'tasks': [task.to_dict() for task in self.tasks]
+        }
+
 
 class Task(db.Model):
     __tablename__ = 'tasks'
@@ -42,3 +60,16 @@ class Task(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
                            onupdate=lambda: datetime.now(timezone.utc))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'status': self.status,
+            'priority': self.priority,
+            'due_date': self.due_date.isoformat() if self.due_date else None,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'project_id': self.project_id
+        }
