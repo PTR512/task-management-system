@@ -62,12 +62,7 @@ git clone https://github.com/yourusername/task-management-system.git
 cd task-management-system
 ```
 
-2. Install required dependencies
-```bash
-pip install -r requirements.txt
-```
-
-3. Run with Docker
+2. Run with Docker
 ```bash
 docker-compose up --build
 ```
