@@ -1,10 +1,8 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from app.database import db
 
 from app.config import Config
-
-db = SQLAlchemy()
 
 
 def create_app(config_class=Config):
