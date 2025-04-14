@@ -21,6 +21,16 @@ def app():
 
 
 @pytest.fixture
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture
+def runner(app):
+    return app.test_cli_runner()
+
+
+@pytest.fixture
 def init_database(app):
     with app.app_context():
         project1 = Project(name='Test Project 1', description='Description for Project 1')
@@ -32,7 +42,7 @@ def init_database(app):
             title='Test Task 1',
             description='Test Description 1',
             status='todo',
-            priority='high',
+            priority=5,
             due_date=datetime.utcnow() + timedelta(days=1),
             project_id=project1.id
         )
@@ -41,11 +51,15 @@ def init_database(app):
             title='Test Task 2',
             description='Test Description 2',
             status='in_progress',
-            priority='medium',
+            priority=2,
             project_id=project2.id
         )
 
         db.session.add_all([task1, task2])
         db.session.commit()
 
-        return {'projects': [project1, project2], 'tasks': [task1, task2]}
+        yield {'projects': [project1, project2], 'tasks': [task1, task2]}
+
+        db.session.remove()
+        db.drop_all()
+        db.create_all()
