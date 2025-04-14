@@ -14,4 +14,14 @@ def create_app(config_class=Config):
     db.init_app(app)
     CORS(app)
 
+    from app.routes.tasks import tasks_bp
+    from app.routes.projects import projects_bp
+
+    app.register_blueprint(tasks_bp, url_prefix='/api/tasks')
+    app.register_blueprint(projects_bp, url_prefix='/api/projects')
+
+    @app.route('/api/health')
+    def health_check():
+        return {"status": "healthy"}
+
     return app
